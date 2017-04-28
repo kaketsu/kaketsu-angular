@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { OrderService } from '../service/order.service';
-
+import { RandomNumService } from '../service/random.service';
 @Component({
   selector: 'take-desk',
   templateUrl: './takeDesk.component.html',
@@ -9,7 +9,8 @@ import { OrderService } from '../service/order.service';
 export class TakeDeskComponent {
   private orderAll: string[] = [];
 
-  constructor(private orderService: OrderService) {
+  constructor(private orderService: OrderService, private randomService: RandomNumService) {
+    // order subscribe
     orderService.orderAnnounced$.subscribe((order) => {
         setTimeout(() => {
           console.log('Take Order:' + order);
@@ -19,7 +20,11 @@ export class TakeDeskComponent {
     });
   }
 
-  announce() {
+  generateOrderNum() {
+    return this.randomService.randomNum();
+  }
 
+  confirmOrder() {
+    this.orderService.confirmOrder('gggg');
   }
 }

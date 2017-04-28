@@ -1,4 +1,7 @@
 <div class="order-block">
+    <ul *ngIf="orderHistory.length>0">
+        <li *ngFor="let his of orderHistory">{{his}}</li>
+    </ul>
     <div>
         <button (click)="generateOrder()">Order</button>
         <input [(ngModel)]="newOrder">

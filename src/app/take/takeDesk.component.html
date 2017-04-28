@@ -1,5 +1,5 @@
 <div class="take-block">
     <ul>
-        <li *ngFor="let od of orderAll">{{od}}</li>
+        <li *ngFor="let od of orderAll">{{od}}<button (click)="confirmOrder()">confirm</button></li>
     </ul>
 </div>

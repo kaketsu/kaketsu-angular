@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { OrderDeskComponent } from './order/orderDesk.component';
 import { TakeDeskComponent } from './take/takeDesk.component';
 import { OrderService } from './service/order.service';
+import { RandomNumService } from './service/random.service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -19,7 +20,7 @@ import { OrderService } from './service/order.service';
     HttpModule,
     NgProgressModule
   ],
-  providers: [OrderService],
+  providers: [OrderService, RandomNumService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
