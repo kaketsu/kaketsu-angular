@@ -6,7 +6,7 @@ import { NgProgressModule } from 'ng2-progressbar';
 import { AppComponent } from './app.component';
 import { OrderDeskComponent } from './order/orderDesk.component';
 import { TakeDeskComponent } from './take/takeDesk.component';
-
+import { OrderService } from './service/order.service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -19,7 +19,7 @@ import { TakeDeskComponent } from './take/takeDesk.component';
     HttpModule,
     NgProgressModule
   ],
-  providers: [],
+  providers: [OrderService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
