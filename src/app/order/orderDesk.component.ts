@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Headers, Http } from '@angular/http';
 import { OrderService } from '../service/order.service';
 import { NgProgressService } from 'ng2-progressbar';
 import { RandomNumService } from '../service/random.service';
+// import data from '../service/mock.service';
 
 @Component({
   selector: 'order-desk',
@@ -12,14 +14,19 @@ import { RandomNumService } from '../service/random.service';
 export class OrderDeskComponent {
   private newOrder = '';
   private orderHistory = [];
+  // private menuUrl = '/menu/getMenus';
+
   constructor(private orderService: OrderService, private progressService: NgProgressService,
-              private randomService: RandomNumService) {
+              private randomService: RandomNumService, private http: Http) {
     // confirm
     orderService.orderConfirmed$.subscribe((data) => {
       console.log(data);
 
       // this.progressService.done();
     });
+
+
+
   }
   generateOrder() {
     if (this.newOrder) {
@@ -33,4 +40,9 @@ export class OrderDeskComponent {
       }, 1000);
     }
   }
+
+  ngOnInit() {
+    console.log('init');
+  }
+
 }

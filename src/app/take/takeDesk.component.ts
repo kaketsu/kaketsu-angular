@@ -16,7 +16,6 @@ export class TakeDeskComponent {
           console.log('Take Order:' + order);
           this.orderAll.push(order);
         }, 1000);
-        // this.history.push(`${astronaut} confirmed the mission`);
     });
   }
 
@@ -25,6 +24,6 @@ export class TakeDeskComponent {
   }
 
   confirmOrder() {
-    this.orderService.confirmOrder('gggg');
+    this.orderService.confirmOrder('this is a new order');
   }
 }
