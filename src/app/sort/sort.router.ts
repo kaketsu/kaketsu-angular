@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SortMethodComponent } from './sort.component';
 import { QuickSortComponent } from './quicksort/quicksort.component';
+import { BubbleSortComponent } from './bubblesort/bubblesort.component';
 
 const SortRoutes: Routes = [
   {
@@ -11,6 +12,10 @@ const SortRoutes: Routes = [
       {
         path: 'quicksort',
         component: QuickSortComponent
+      },
+      {
+        path: 'bubblesort',
+        component: BubbleSortComponent
       }
    ]
   }

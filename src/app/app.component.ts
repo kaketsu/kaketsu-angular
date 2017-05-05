@@ -13,7 +13,7 @@ import 'rxjs/add/observable/fromEvent';
 export class AppComponent {
   title = 'rxjs';
   constructor (private progressService: NgProgressService, private router: Router,) {
-    this.router.events.subscribe(event => console.log(event));
+    this.router.events.subscribe(event => this.toggleProgress(event));
     this.progressService.start();
     setTimeout(() => {
       this.progressService.done();
@@ -33,8 +33,14 @@ export class AppComponent {
     ).subscribe(x => console.log(x));
     */
   }
-  
-  
-
+  toggleProgress(event) {
+    if (event instanceof NavigationStart) {
+      this.progressService.start();
+      return;
+    }
+    if (event instanceof NavigationEnd || event instanceof NavigationError || event instanceof NavigationCancel) {
+      this.progressService.done();
+    }
+  }
 }
 

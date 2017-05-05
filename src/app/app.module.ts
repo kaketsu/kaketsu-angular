@@ -15,6 +15,7 @@ import { AppRoutingModule } from './app.router';
 import { SortRoutingModule } from './sort/sort.router'
 import { SortMethodComponent } from './sort/sort.component';
 import { QuickSortComponent } from './sort/quicksort/quicksort.component';
+import { BubbleSortComponent } from './sort/bubblesort/bubblesort.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,7 +23,8 @@ import { QuickSortComponent } from './sort/quicksort/quicksort.component';
     TakeDeskComponent,
     SortMethodComponent,
     HomeComponent,
-    QuickSortComponent
+    QuickSortComponent,
+    BubbleSortComponent
   ],
   imports: [
     BrowserModule,
