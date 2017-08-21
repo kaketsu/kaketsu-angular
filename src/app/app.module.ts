@@ -12,10 +12,12 @@ import { OrderService } from './service/order.service';
 import { RandomNumService } from './service/random.service';
 import { AppRoutingModule } from './app.router';
 
-import { SortRoutingModule } from './sort/sort.router'
+import { SortRoutingModule } from './sort/sort.router';
 import { SortMethodComponent } from './sort/sort.component';
 import { QuickSortComponent } from './sort/quicksort/quicksort.component';
 import { BubbleSortComponent } from './sort/bubblesort/bubblesort.component';
+import { MyPipe } from './my.pipe';
+import { PlaygroundComponent } from './playground/playground.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,7 +26,9 @@ import { BubbleSortComponent } from './sort/bubblesort/bubblesort.component';
     SortMethodComponent,
     HomeComponent,
     QuickSortComponent,
-    BubbleSortComponent
+    BubbleSortComponent,
+    MyPipe,
+    PlaygroundComponent
   ],
   imports: [
     BrowserModule,

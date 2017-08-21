@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgProgressService } from 'ng2-progressbar';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from "@angular/router";
 import 'rxjs/add/observable/fromEvent';
-
 
 @Component({
   selector: 'app-root',
