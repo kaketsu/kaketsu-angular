@@ -22,7 +22,9 @@
         "styles.css"
       ],
       "scripts": [
-        "./assets/vendor/g6.min.js"
+        "./assets/vendor/g6.min.js",
+        "../node_modules/graphlib/dist/graphlib.js",
+        "../node_modules/dagre/dist/dagre.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

@@ -18,6 +18,7 @@ import { QuickSortComponent } from './sort/quicksort/quicksort.component';
 import { BubbleSortComponent } from './sort/bubblesort/bubblesort.component';
 import { MyPipe } from './my.pipe';
 import { PlaygroundComponent } from './playground/playground.component';
+import { DrageComponent } from './drage/drage.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,7 +29,8 @@ import { PlaygroundComponent } from './playground/playground.component';
     QuickSortComponent,
     BubbleSortComponent,
     MyPipe,
-    PlaygroundComponent
+    PlaygroundComponent,
+    DrageComponent
   ],
   imports: [
     BrowserModule,

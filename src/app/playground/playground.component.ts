@@ -365,7 +365,7 @@ export class PlaygroundComponent implements OnInit {
             id: 'dropzone',           // 容器ID
             width: 800,   // 画布宽
             height: 800, // 画布高
-            mode: 'edit',
+            // mode: 'edit',
             grid: {
                 forceAlign: true, // 是否支持网格对齐复制代码
                 cell: 10          // 网格大小
@@ -466,7 +466,7 @@ export class PlaygroundComponent implements OnInit {
             }
         });
 
-        function rdb (){
+        function rdb() {
             const r = Math.random();
             return r > 0.5;
         }
@@ -496,7 +496,7 @@ export class PlaygroundComponent implements OnInit {
     }
 
     registerCustomRect() {
-        G6.registNode('customRect', {
+        G6.registNode('customNode', {
             draw: function (cfg, group) {
                 const shape = group.addShape('rect', {
                     attrs: {
@@ -504,9 +504,10 @@ export class PlaygroundComponent implements OnInit {
                         y: cfg.y - 50,
                         width: 100,
                         height: 100,
-                        fill: '#fff',
+                        fill: '#f1f1f1',
                         stroke: 'green',
-                        radius: 5
+                        radius: 5,
+                        linkable: false
                     }
                 });
                 return shape;
@@ -526,7 +527,8 @@ export class PlaygroundComponent implements OnInit {
     createCanvasReactor(x, y, width, height) {
         // 增加新的节点
         const newNode = this.net.add('node', {
-            'shape': 'customRect',
+            'shape': 'customNode',
+            'label': 'reactor',
             'x': x - 280,
             'y': y - 50,
             'size': [
