@@ -1,0 +1,65 @@
+#play {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    background-color: whitesmoke;
+}
+.side-container{
+    width: 150px;
+    margin: 50px 20px;
+    background: #fff;
+    border:1px solid #ddd;
+    border-radius: 5px;
+}
+.reactor {
+    border: 1px solid #999;
+    height: 30px;
+    width: 120px;
+    margin: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #fff;
+}
+
+.dropzone {
+    flex: 1;
+    margin: 50px 20px;
+    background: #fff;
+    border:1px solid #ddd;
+    border-radius: 5px;
+    position: relative;
+}
+
+#dropzone {
+    flex: 1;
+    margin: 50px 20px;
+    background: #fff;
+    border:1px solid #ddd;
+    border-radius: 5px;
+    position: relative;
+}
+
+.newReactor {
+    height: 150px;
+    width: 150px;
+    border: 1px solid #bbb;
+    position: absolute;
+}
+
+circle:hover {
+    fill: #111;
+}
+
+.graphContainer {
+    margin: 50px 20px;
+    background: #fff;
+    border:1px solid #ddd;
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 800px;
+    height: 800px;
+    background: url(../../assets/images/grid.gif);
+    cursor: default;
+    touch-action: none;
+}
