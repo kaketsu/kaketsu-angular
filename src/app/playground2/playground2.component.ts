@@ -18,6 +18,9 @@ type mxPoint = any;
 declare var mxPoint: any;
 type mxPolyline = any;
 declare var mxPolyline: any;
+type mxConstants = any;
+declare var mxConstants: any;
+
 
 @Component({
     selector: 'app-playground2',
@@ -26,67 +29,131 @@ declare var mxPolyline: any;
 })
 export class Playground2Component implements OnInit {
     private container;
+    private graph;
 
     constructor() {
+        // mxGraph.prototype.getAllConnectionConstraints = function(terminal, source) {
+        //     console.log(terminal);
+        //     console.log(source);
+        //     if (terminal != null && terminal.shape != null) {
+        //         if (terminal.shape.stencil != null) {
+        //             if (terminal.shape.stencil != null) {
+        //                 return terminal.shape.stencil.constraints;
+        //             }
+        //         } else if (terminal.shape.constraints != null) {
+        //             return terminal.shape.constraints;
+        //         }
+        //     }
 
-        mxGraph.prototype.getAllConnectionConstraints = function(terminal, source) {
-            if (terminal != null && terminal.shape != null)
-            {
-            if (terminal.shape.stencil != null)
-            {
-                if (terminal.shape.stencil != null)
-                {
-                return terminal.shape.stencil.constraints;
-                }
-            }
-            else if (terminal.shape.constraints != null)
-            {
-                return terminal.shape.constraints;
-            }
-            }
+        //     return null;
+        // };
+        // mxShape.prototype.constraints = [
+        //     new mxConnectionConstraint(new mxPoint(0.25, 0), true, 'aaa'),
+        //     new mxConnectionConstraint(new mxPoint(0.75, 1), false, 'bbb')
+        // ];
 
-            return null;
-        };
-        mxShape.prototype.constraints = [
-            new mxConnectionConstraint(new mxPoint(0.25, 0), true)];
-
-        // Edges have no connection points
-        mxPolyline.prototype.constraints = null;
+        // // Edges have no connection points
+        // mxPolyline.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.25, 0), true)];
     }
+
+    customerShape() {
+
+    }
+
+    init
 
     initContainer(container) {
         if (!mxClient.isBrowserSupported()) {
-            // Displays an error message if the browser is not supported.
             mxUtils.error('Browser is not supported!', 200, false);
         } else {
             // Disables the built-in context menu
             mxEvent.disableContextMenu(container);
 
             // Creates the graph inside the given container
-            var graph = new mxGraph(container);
+            this.graph = new mxGraph(container);
 
             // Enables rubberband selection
-            new mxRubberband(graph);
+            new mxRubberband(this.graph);
 
-            graph.setConnectable(true);
-            graph.setCellsEditable(false);
+            this.graph.setConnectable(function() {
+                console.log(this.getModel())
+                return this.getModel()
+            });
+            this.graph.setConnectableEdges(false);
+
+            this.graph.setCellsEditable(false);
+
+            // this.graph.isCellEditable = function(cell) {
+            //     console.log(cell);
+            //     return this.getModel().isEdge(cell);
+            // };
+
+            // this.graph.isCellDeletable = function(cell) {
+            //     return true;
+            // }
+            // console.log(this.graph.isCellDeletable);
+
+            this.graph.setCellsResizable(false);
 
             // Gets the default parent for inserting new cells. This
             // is normally the first child of the root (ie. layer 0).
-            var parent = graph.getDefaultParent();
 
-            // Adds cells to the model in a single step
-            graph.getModel().beginUpdate();
-            try {
-                var v1 = graph.insertVertex(parent, null, 'Hello,', 20, 20, 120, 80);
-                var v2 = graph.insertVertex(parent, null, 'World!', 200, 150, 120, 80);
-                // var e1 = graph.insertEdge(parent, null, '', v1, v2);
-            } finally {
-                // Updates the display
-                graph.getModel().endUpdate();
+            this.graph.createEdgeHandler = function(state, edgeStyle) {
+                console.log(state);
+                if (!state.visibleTargetState) {
+                    return null;
+                }
+                console.log(edgeStyle);
             }
+
         }
     }
+
+    initStyle() {
+        var style = this.graph.getStylesheet().getDefaultVertexStyle();
+        style[mxConstants.STYLE_ROUNDED] = true;
+        style[mxConstants.STYLE_FILLCOLOR] = '#ffffff';
+        style[mxConstants.STYLE_STROKECOLOR] = '#000000';
+        style[mxConstants.STYLE_STROKEWIDTH] = '1';
+        style[mxConstants.STYLE_FONTCOLOR] = '#000000';
+        style[mxConstants.STYLE_FONTSIZE] = '12';
+        style[mxConstants.STYLE_FONTSTYLE] = 1;
+        this.graph.getStylesheet().putDefaultVertexStyle(style);
+    }
+
+    draw() {
+         // Adds cells to the model in a single step
+        const parent = this.graph.getDefaultParent();
+        this.graph.getModel().beginUpdate();
+        try {
+            const v1 = this.graph.insertVertex(parent, null, 'Process', 60, 60, 120, 120);
+            const v2 = this.graph.insertVertex(v1, null, 'in', 0, 0.5, 16, 16, 'fontSize=9;shape=ellipse;resizable=0;');
+            const v3 = this.graph.insertVertex(v1, null, 'out', 1, 0.25, 16, 16, 'fontSize=9;shape=ellipse;resizable=0;');
+            const v4 = this.graph.insertVertex(v1, null, 'out', 1, 0.5, 16, 16, 'fontSize=9;shape=ellipse;resizable=0;');
+            const v5 = this.graph.insertVertex(v1, null, '', 1, 0.75, 16, 16, 'fontSize=9;shape=ellipse;resizable=0;');
+            v2.geometry.offset = new mxPoint(-8, -8);
+            v2.geometry.relative = true;
+
+            v3.geometry.offset = new mxPoint(-8, -8);
+            v3.geometry.relative = true;
+
+            v4.geometry.offset = new mxPoint(-8, -8);
+            v4.geometry.relative = true;
+
+            v5.geometry.offset = new mxPoint(-8, -8);
+            v5.geometry.relative = true;
+
+            // var e1 = graph.insertEdge(parent, null, '', v1, v2);
+        } finally {
+            // Updates the display
+            this.graph.getModel().endUpdate();
+        }
+    }
+
+    initReactor() {
+
+    }
+
 
     ngOnInit() {
         // this.initBase();
@@ -96,6 +163,9 @@ export class Playground2Component implements OnInit {
         // this.registerCustomRect();
         this.container = document.querySelector('.graphContainer');
         this.initContainer(this.container);
+        this.initStyle();
+        this.draw();
+        this.draw();
         // this.initContainer();
     }
 
