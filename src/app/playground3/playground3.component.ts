@@ -46,6 +46,7 @@ export class Playground3Component implements OnInit {
     private graph;
     private selectedCells;
     private selectedReactor;
+    private allEdges;
 
     constructor() {
     }
@@ -70,6 +71,8 @@ export class Playground3Component implements OnInit {
             // Creates the graph inside the given container
             this.graph = new mxGraph(this.container);
 
+            this.allEdges = [];
+
             // Enables rubberband selection
             new mxRubberband(this.graph);
 
@@ -83,6 +86,8 @@ export class Playground3Component implements OnInit {
 
             this.graph.setMultigraph(false);
 
+            this.graph.setAllowLoops(false);
+
             // highLight
             // var highlight = new mxCellTracker(this.graph, '#00FF00');
 
@@ -92,15 +97,45 @@ export class Playground3Component implements OnInit {
 
             // 创建edge时候的回掉函数
             const self = this;
-            this.graph.createEdgeHandler = function(state, edgeStyle) {
-                console.log('callback when create edge');
-                console.log(state);
+            this.graph.createEdgeHandler = function(state) {
+                self.graph.getModel().beginUpdate();
                 self.deleteOverlay(state.visibleTargetState.cell.parent.id, 'xx');
+                self.addOverlay(state.visibleTargetState.cell.parent.id, 'xx', '/assets/images/check.png');
+
+                if (self.allEdges.indexOf(state.cell) !== -1 ) {
+
+                } else if (self.sameReactorValidate(state)) {
+                    self.graph.getModel().remove(state.cell);
+
+                } else if (self.portOrderValidate(state)) {
+                    self.graph.getModel().remove(state.cell);
+
+                } else if (self.inPortInUseValidate(state) || self.outPortInUseValidate(state)) {
+                    const inEdge = self.inPortInUseValidate(state);
+                    if (inEdge) {
+                        self.graph.getModel().remove(inEdge);
+                        self.allEdges.splice(self.allEdges.indexOf(inEdge), 1);
+                    }
+
+                    const outEdge = self.outPortInUseValidate(state);
+                    if (outEdge) {
+                        self.graph.getModel().remove(outEdge);
+                        self.allEdges.splice(self.allEdges.indexOf(outEdge), 1);
+                    }
+                    self.allEdges.push(state.cell);
+
+                } else {
+                    self.allEdges.push(state.cell);
+                }
+
+                self.graph.getModel().endUpdate();
+
             };
+
 
             // selected cell
             this.graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) => {
-                console.log(sender.cells);
+                // console.log(sender.cells);
                 // this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, "#FF0000", sender.cells);
                 this.selectedCells = sender.cells;
 
@@ -137,10 +172,26 @@ export class Playground3Component implements OnInit {
 
             this.configureStylesheet(this.graph);
 
-            mxConstants.HANDLE_FILLCOLOR = '#99ccff';
-            mxConstants.HANDLE_STROKECOLOR = '#0088cf';
-            mxConstants.VERTEX_SELECTION_COLOR = '';
-            mxConstants.VERTEX_SELECTION_DASHED = false;
+            // this.graph.getAllConnectionConstraints = function(terminal) {
+            //     console.log(terminal);
+            //     var geo = (terminal != null) ? this.getCellGeometry(terminal.cell) : null;
+
+            //     if ((geo != null ? !geo.relative : false) &&
+            //         this.getModel().isVertex(terminal.cell) &&
+            //         this.getModel().getChildCount(terminal.cell) === 0)
+            //     {
+            //             return [new mxConnectionConstraint(new mxPoint(0, 0.5), false),
+            //                 new mxConnectionConstraint(new mxPoint(1, 0.5), false)];
+            //         }
+
+            //         return null;
+            // };
+
+            this.graph.getConnectionConstraint = function(edge, terminal, source) {
+                // console.log(edge);
+                // console.log(terminal);
+                // console.log(source);
+            }
 
         }
     }
@@ -157,28 +208,84 @@ export class Playground3Component implements OnInit {
         style[mxConstants.STYLE_FILLCOLOR] = '#d5e2f5';
         style[mxConstants.STYLE_GRADIENTCOLOR] = '#fff';
         this.graph.getStylesheet().putDefaultVertexStyle(style);
+
+
+        mxConstants.HANDLE_FILLCOLOR = '#99ccff';
+        mxConstants.HANDLE_STROKECOLOR = '#0088cf';
+        mxConstants.VERTEX_SELECTION_COLOR = '';
+        mxConstants.VERTEX_SELECTION_DASHED = false;
+
+        // edge style
+        const edgeStyle = this.graph.getStylesheet().getDefaultEdgeStyle();
+        edgeStyle[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
+        edgeStyle[mxConstants.STYLE_ELBOW] = mxConstants.ELBOW_HORIZONTAL;
+        edgeStyle[mxConstants.STYLE_ROUNDED] = true;
     }
 
-    addOverlay = function(id, state){
-        var cell = this.graph.getModel().getCell(id);
+    addOverlay = function(id, state, imageUrl){
+        const cell = this.graph.getModel().getCell(id);
         // this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "#FF0000", [cell]);
         // this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "#FFFFFF", [cell]);
-        this.graph.addCellOverlay(cell, this.createOverlay(new mxImage('/assets/images/warning.gif', 20, 20), state));
+        const overlay = new mxCellOverlay(new mxImage(imageUrl, 20, 20),
+                                          state, mxConstants.ALIGN_LEFT, mxConstants.ALIGN_BOTTOM, new mxPoint(15, -15));
+
+        overlay.addListener(mxEvent.CLICK, (sender, evt) => {
+            mxUtils.alert(state);
+        });
+        this.graph.addCellOverlay(cell, overlay);
     };
 
     deleteOverlay = function(id, state){
-        var cell = this.graph.getModel().getCell(id);
+        const cell = this.graph.getModel().getCell(id);
         this.graph.removeCellOverlays(cell);
     }
 
-    createOverlay = function(image, tooltip){
-        var overlay = new mxCellOverlay(image, tooltip, mxConstants.ALIGN_LEFT, mxConstants.ALIGN_BOTTOM, new mxPoint(15, -15));
+    sameReactorValidate(state) {
+        const source = state.visibleSourceState.cell.parent;
+        const target = state.visibleTargetState.cell.parent;
+        if (source === target) {
+            return true;
+        }
+        return false;
+    }
 
-        overlay.addListener(mxEvent.CLICK, (sender, evt) => {
-            mxUtils.alert(tooltip);
-        });
-        return overlay;
-    };
+    inPortInUseValidate(state) {
+        const targetPort = state.cell.target;
+        let returnEdge = null;
+        if (this.allEdges && this.allEdges.length > 0) {
+            this.allEdges.forEach((edgeItem) => {
+                if (targetPort === edgeItem.target) {
+                    returnEdge = edgeItem;
+                }
+            });
+        }
+        return returnEdge;
+    }
+
+    outPortInUseValidate(state) {
+        const sourcePort = state.cell.source;
+        let returnEdge = null;
+
+        if (this.allEdges && this.allEdges.length > 0) {
+            this.allEdges.forEach((edgeItem) => {
+                if (sourcePort === edgeItem.source) {
+                    returnEdge = edgeItem;
+                }
+            });
+        }
+        return returnEdge;
+    }
+
+    portOrderValidate(state) {
+        const sourcePort = state.cell.source;
+        const targetPort = state.cell.target;
+
+        if (sourcePort.value === 'in' || targetPort.value === 'out') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     configureStylesheet(graph) {
         var style = new Object();
@@ -226,14 +333,47 @@ export class Playground3Component implements OnInit {
         style[mxConstants.STYLE_SPACING_RIGHT] = '55';
         graph.getStylesheet().putCellStyle('left', style);
 
-
-
-        var edgeStyle = this.graph.getStylesheet().getDefaultEdgeStyle();
-        edgeStyle[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
-        edgeStyle[mxConstants.STYLE_ELBOW] = mxConstants.ELBOW_HORIZONTAL;
-        edgeStyle[mxConstants.STYLE_ROUNDED] = true;
+       
     };
 
+
+    creatReactor(x, y, outNodes) {
+        const parent = this.graph.getDefaultParent();
+        this.graph.getModel().beginUpdate();
+        const outLength = outNodes;
+        try {
+            const v1 = this.graph.insertVertex(parent, null, `Reactor${outNodes}` , x, y, 100, 30*(outNodes+1), 'top');
+            v1.setConnectable(false);
+            console.log(v1);
+            // this.graph.setCellWarning(v1, 'xx');
+            this.addOverlay(v1.id, 'warning', '/assets/images/warning.gif');
+
+            const v2 = this.graph.insertVertex(v1, null, 'in', 0, 0.5, 16, 16, 'fontSize=9;shape=ellipse;resizable=0;');
+            v2.geometry.offset = new mxPoint(-8, -8);
+            v2.geometry.relative = true;
+
+            while(outNodes > 0) {
+                let out = this.graph.insertVertex(v1, null, 'out', 1, (outLength-outNodes+1)/(outLength+1), 16, 16,
+                                                    'fontSize=9;shape=ellipse;resizable=0;');
+                out.geometry.offset = new mxPoint(-8, -8);
+                out.geometry.relative = true;
+                outNodes--;
+            }
+
+        } finally {
+            // Updates the display
+            this.graph.getModel().endUpdate();
+        }
+    }
+
+    userObject() {
+        const doc = mxUtils.createXmlDocument();
+        const obj = doc.createElement('Reactor');
+        obj.setAttribute('class', 'filter');
+        obj.setAttribute('label', 'Hello, World!');
+        obj.setAttribute('checked', 'true');
+        return obj;
+    }
 
     initLeftbarDrag() {
         let dragged;
@@ -282,43 +422,5 @@ export class Playground3Component implements OnInit {
             // this.createCanvasReactor((<any>event).x, (<any>event).y, 100, 100);
             // this.createDivRect((<any>event).x, (<any>event).y, 180, 180);
         });
-    }
-
-    creatReactor(x, y, outNodes) {
-        const parent = this.graph.getDefaultParent();
-        this.graph.getModel().beginUpdate();
-        const outLength = outNodes;
-        try {
-            const v1 = this.graph.insertVertex(parent, null, `Reactor${outNodes}` , x, y, 100, 80, 'top');
-            v1.setConnectable(false);
-            console.log(v1);
-            // this.graph.setCellWarning(v1, 'xx');
-            this.addOverlay(v1.id, 'warning');
-
-            const v2 = this.graph.insertVertex(v1, null, 'in', 0, 0.5, 16, 16, 'fontSize=9;shape=ellipse;resizable=0;');
-            v2.geometry.offset = new mxPoint(-8, -8);
-            v2.geometry.relative = true;
-
-            while(outNodes > 0) {
-                let out = this.graph.insertVertex(v1, null, 'out', 1, (outLength-outNodes+1)/(outLength+1), 16, 16,
-                                                    'fontSize=9;shape=ellipse;resizable=0;');
-                out.geometry.offset = new mxPoint(-8, -8);
-                out.geometry.relative = true;
-                outNodes--;
-            }
-
-        } finally {
-            // Updates the display
-            this.graph.getModel().endUpdate();
-        }
-    }
-
-    userObject() {
-        const doc = mxUtils.createXmlDocument();
-        const obj = doc.createElement('Reactor');
-        obj.setAttribute('class', 'filter');
-        obj.setAttribute('label', 'Hello, World!');
-        obj.setAttribute('checked', 'true');
-        return obj;
     }
 }
